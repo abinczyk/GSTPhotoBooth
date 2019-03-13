@@ -1,10 +1,71 @@
 import * as BABYLON from 'babylonjs';
 import * as GUI from 'babylonjs-gui';
 import {Observable} from 'rxjs';
+import { zip, zipAll } from 'rxjs/operators';
 
 export class GameUtils {
 
-    /**
+//TODO: Usage GUI and grid
+    public static createMatrix(scene: BABYLON.Scene) {
+        // GUI
+        var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        var size: BABYLON.ISize = advancedTexture.getSize();
+ 
+        var grid = new BABYLON.GUI.Grid();   
+        grid.background = "black"; 
+        advancedTexture.addControl(grid); 
+        
+        grid.width = "1000px";
+        var width = 1616 / 20 * 3;   
+        var height = 1212 / 20 * 4;
+        grid.height = "1000px";
+
+        grid.addColumnDefinition(width, false);
+        grid.addColumnDefinition(width);
+        grid.addColumnDefinition(width);
+       
+        grid.addRowDefinition(height);
+        grid.addRowDefinition(height);
+        grid.addRowDefinition(height);
+        grid.addRowDefinition(height);
+
+        let image: BABYLON.GUI.Image[] = [];
+        //var photo[0][0] ="./assets/photos/0.0.jpg";
+        //var picTest = new BABYLON.GUI.Image("0.0",photo[0][0]);
+        var z = 0;
+        var zz = 0;
+
+        for(z = 0;  z < 4; z++) {
+            for (zz = 0; zz < 3; zz++) {
+                console.log("./assets/photos/" + z + "." + zz + ".jpg");
+                image[z * 10 + zz] = new BABYLON.GUI.Image("but" + z + "." + zz, "./assets/photos/" + z + "." + zz + ".jpg");
+                
+                image[z * 10 + zz].stretch = GUI.Image.STRETCH_NONE;
+                //image.width = 0.2;
+                //image.height = "40px";
+                grid.addControl(image[z * 10 + zz], z, zz);    
+            }
+        }
+       
+
+        /*
+        var rect = new BABYLON.GUI.Rectangle();
+        rect.background = "green";
+        rect.thickness = 0;
+        grid.addControl(rect, 3, 0);     
+
+        rect = new BABYLON.GUI.Rectangle();
+        rect.background = "red";
+        rect.thickness = 0;
+        grid.addControl(rect, 1, 2); 
+
+        rect = new BABYLON.GUI.Rectangle();
+        rect.background = "yellow";
+        rect.thickness = 0;
+        grid.addControl(rect, 0, 2); 
+        */
+    }
+       /**
      * Creates a basic ground
      * @param scene
      */
@@ -58,6 +119,8 @@ export class GameUtils {
         guiTexture.addControl(btnTest);
     }
 
+
+  
     /**
      * Returns Observable of mesh array, which are loaded from a file.
      * After mesh importing all meshes become given scaling, position and rotation.

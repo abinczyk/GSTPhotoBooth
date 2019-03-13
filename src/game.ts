@@ -60,7 +60,8 @@ export class Game {
                     textControl.text = "Start Swimming";
                 }
             });
-
+        GameUtils.createMatrix(this._scene);
+ 
         // Physics engine also works
         let gravity = new BABYLON.Vector3(0, -0.9, 0);
         this._scene.enablePhysics(gravity, new BABYLON.CannonJSPlugin());
