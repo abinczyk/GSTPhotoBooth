@@ -49,7 +49,21 @@ export class Game {
                 );
             });
         // finally the new ui
-        GameUtils.createGui("Start Swimming",
+        let guiTexture: GUI.Grid = GameUtils.createGUIMatrix(this._scene);
+        
+  
+     /*   GameUtils.createGui(guiTexture, 0, 0, "Start xxSwimming",
+            (btn) => {
+                let textControl = btn.children[0] as GUI.TextBlock;
+                this._swim = !this._swim;
+                if (this._swim) {
+                    textControl.text = "Stop xxSwimming";
+                }
+                else {
+                    textControl.text = "Start xxSwimming";
+                }
+            });
+            GameUtils.createGui(guiTexture, 0, 1, "Start Swimming",
             (btn) => {
                 let textControl = btn.children[0] as GUI.TextBlock;
                 this._swim = !this._swim;
@@ -60,7 +74,8 @@ export class Game {
                     textControl.text = "Start Swimming";
                 }
             });
-        GameUtils.createMatrix(this._scene);
+            */
+       GameUtils.createMatrix(this._scene);
  
         // Physics engine also works
         let gravity = new BABYLON.Vector3(0, -0.9, 0);

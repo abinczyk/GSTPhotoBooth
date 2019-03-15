@@ -2,16 +2,18 @@ import * as BABYLON from 'babylonjs';
 import * as GUI from 'babylonjs-gui';
 import {Observable} from 'rxjs';
 import { zip, zipAll } from 'rxjs/operators';
+import { AdvancedDynamicTexture } from 'babylonjs-gui';
+import { AsyncAction } from 'rxjs/scheduler/AsyncAction';
 
 export class GameUtils {
 
 //TODO: Usage GUI and grid
-    public static createMatrix(scene: BABYLON.Scene) {
+    public static createMatrix(scene: BABYLON.Scene): GUI.Grid {
         // GUI
-        var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
         var size: BABYLON.ISize = advancedTexture.getSize();
  
-        var grid = new BABYLON.GUI.Grid();   
+        var grid = new GUI.Grid();   
         grid.background = "black"; 
         advancedTexture.addControl(grid); 
         
@@ -29,7 +31,7 @@ export class GameUtils {
         grid.addRowDefinition(height);
         grid.addRowDefinition(height);
 
-        let image: BABYLON.GUI.Image[] = [];
+        let image: GUI.Image[] = [];
         //var photo[0][0] ="./assets/photos/0.0.jpg";
         //var picTest = new BABYLON.GUI.Image("0.0",photo[0][0]);
         var z = 0;
@@ -38,7 +40,7 @@ export class GameUtils {
         for(z = 0;  z < 4; z++) {
             for (zz = 0; zz < 3; zz++) {
                 console.log("./assets/photos/" + z + "." + zz + ".jpg");
-                image[z * 10 + zz] = new BABYLON.GUI.Image("but" + z + "." + zz, "./assets/photos/" + z + "." + zz + ".jpg");
+                image[z * 10 + zz] = new GUI.Image("but" + z + "." + zz, "./assets/photos/" + z + "." + zz + ".jpg");
                 
                 image[z * 10 + zz].stretch = GUI.Image.STRETCH_NONE;
                 //image.width = 0.2;
@@ -46,24 +48,45 @@ export class GameUtils {
                 grid.addControl(image[z * 10 + zz], z, zz);    
             }
         }
+        return grid;
+    }
        
+    public static createGUIMatrix(scene: BABYLON.Scene): GUI.Grid  {
+        // GUI
+        var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI");
+        var size: BABYLON.ISize = advancedTexture.getSize();
+    
+        
+        var grid = new GUI.Grid();   
+        grid.left = 0;
+        grid.background = "black"; 
+        advancedTexture.addControl(grid); 
+        grid.horizontalAlignment = GUI.Grid.HORIZONTAL_ALIGNMENT_LEFT;
+        grid.verticalAlignment = GUI.Grid.VERTICAL_ALIGNMENT_TOP;
+        grid.width = "150px";
+        var width = 150;   
+        var height = 40;
+        grid.height = "240px";
 
-        /*
-        var rect = new BABYLON.GUI.Rectangle();
-        rect.background = "green";
-        rect.thickness = 0;
-        grid.addControl(rect, 3, 0);     
+        grid.addColumnDefinition(width, false);
+                    
+        let btnTest: GUI.Button[] = [];
+        
+        for(var z=0; z < 6 ; z++) {
+            btnTest[z] = GUI.Button.CreateSimpleButton("but" + z, "xxxxx");
+            btnTest[z].width = "150px";
+            btnTest[z].height = "40px";
+            btnTest[z].color = "white";
+            btnTest[z].background = "grey";
+            btnTest[z].horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+            btnTest[z].verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+            btnTest[z].left = 0;
+            btnTest[z].top = 0;
+            grid.addRowDefinition(height,false);
+            grid.addControl(btnTest[z], z, 0);
+        }
+    return grid;
 
-        rect = new BABYLON.GUI.Rectangle();
-        rect.background = "red";
-        rect.thickness = 0;
-        grid.addControl(rect, 1, 2); 
-
-        rect = new BABYLON.GUI.Rectangle();
-        rect.background = "yellow";
-        rect.thickness = 0;
-        grid.addControl(rect, 0, 2); 
-        */
     }
        /**
      * Creates a basic ground
@@ -95,32 +118,7 @@ export class GameUtils {
         return waterMaterial;
     }
 
-    /**
-     * Creates a BABYLONJS GUI with a single Button
-     */
-    public static createGui(btnText: string, btnClicked: (button: GUI.Button) => void) {
-
-        let guiTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        let btnTest = GUI.Button.CreateSimpleButton("but1", btnText);
-        btnTest.width = "150px";
-        btnTest.height = "40px";
-        btnTest.color = "white";
-        btnTest.background = "grey";
-        btnTest.onPointerUpObservable.add(() => {
-            if (btnClicked) {
-                btnClicked(btnTest);
-            }
-        });
-        btnTest.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-        btnTest.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-        btnTest.left = 12;
-        btnTest.top = 12;
-
-        guiTexture.addControl(btnTest);
-    }
-
-
-  
+   
     /**
      * Returns Observable of mesh array, which are loaded from a file.
      * After mesh importing all meshes become given scaling, position and rotation.
