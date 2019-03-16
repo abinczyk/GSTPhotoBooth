@@ -12,7 +12,8 @@ export class Game {
     private _sharkMesh: BABYLON.AbstractMesh;
     private _sharkAnimationTime = 0;
     private _swim: boolean = false;
-
+    private aktPhoto: {filename:string, row: number, col:number};
+    
     constructor(canvasElement: string) {
         // Create canvas and engine
         this._canvas = <HTMLCanvasElement>document.getElementById(canvasElement);
@@ -49,7 +50,21 @@ export class Game {
                 );
             });
         // finally the new ui
-        let guiTexture: GUI.Grid = GameUtils.createGUIMatrix(this._scene);
+        var sMenu: string[] = ["xxxxx","yyyyy"];
+        var gridGUI: GUI.StackPanel = GameUtils.createGUIMatrix(this._scene, sMenu);
+        var button: GUI.Control;
+        button = gridGUI.getChildByName("but0");
+        button.onPointerUpObservable.add(()=>{
+            console.log("GUI: ", sMenu[0]);
+        })
+        button = gridGUI.getChildByName("but1");
+        button.onPointerUpObservable.add(()=>{
+            console.log("GUI: ", sMenu[1]);
+        })
+        //button.rotation =  90;
+        //button1.color = "blue";
+
+
         
   
      /*   GameUtils.createGui(guiTexture, 0, 0, "Start xxSwimming",
@@ -75,7 +90,30 @@ export class Game {
                 }
             });
             */
-       GameUtils.createMatrix(this._scene);
+       var gridMatrix: GUI.Grid= GameUtils.createMatrix(this._scene);
+       let photos: GUI.Control[] = [];
+           
+       for(var z = 0;  z < 4; z++) {
+        for (var zz = 0; zz < 3; zz++) {
+            photos[z * 10 + zz] = gridMatrix.getChildByName("photo" + z +"." + zz);
+            photos[z * 10 + zz].onPointerUpObservable.add(
+                function(){
+            console.log("GUI: ", this.btn.name);
+
+            this.aktPhoto = {filename:"", col:-1, ro:-1};
+            this.aktPhoto.filename = String(this.btn.name).substr(0,5);
+            this.aktPhoto.row = String(this.btn.name).substr(5,1);
+            this.aktPhoto.col = String(this.btn.name).substr(7,1);
+            this.aktPhoto.filename = "./assets/photos/" + this.aktPhoto.row + "." + this.aktPhoto.col + ".jpg"
+            GameUtils.createPhotoBackground(this._scene,this.aktPhoto.filename)
+            console.log("GUI:filename:", this.aktPhoto.filename,this.aktPhoto.filename);
+            console.log("GUI:row", this.aktPhoto.row);
+            console.log("GUI:col", this.aktPhoto.col);
+        }.bind({btn: photos[z * 10 + zz]}))
+        }
+       }
+    
+       
  
         // Physics engine also works
         let gravity = new BABYLON.Vector3(0, -0.9, 0);

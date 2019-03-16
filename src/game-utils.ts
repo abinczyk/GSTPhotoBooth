@@ -6,7 +6,7 @@ import { AdvancedDynamicTexture } from 'babylonjs-gui';
 import { AsyncAction } from 'rxjs/scheduler/AsyncAction';
 
 export class GameUtils {
-
+ 
 //TODO: Usage GUI and grid
     public static createMatrix(scene: BABYLON.Scene): GUI.Grid {
         // GUI
@@ -40,24 +40,38 @@ export class GameUtils {
         for(z = 0;  z < 4; z++) {
             for (zz = 0; zz < 3; zz++) {
                 console.log("./assets/photos/" + z + "." + zz + ".jpg");
-                image[z * 10 + zz] = new GUI.Image("but" + z + "." + zz, "./assets/photos/" + z + "." + zz + ".jpg");
+                image[z * 10 + zz] = new GUI.Image("photo" + z + "." + zz, "./assets/photos/" + z + "." + zz + ".jpg");
                 
                 image[z * 10 + zz].stretch = GUI.Image.STRETCH_NONE;
                 //image.width = 0.2;
                 //image.height = "40px";
-                grid.addControl(image[z * 10 + zz], z, zz);    
+                grid.addControl(image[z * 10 + zz], z, zz); 
+                 
             }
         }
         return grid;
     }
-       
-    public static createGUIMatrix(scene: BABYLON.Scene): GUI.Grid  {
+    public static createPhotoBackground(scene: BABYLON.Scene, filename:string): GUI.AdvancedDynamicTexture {
+        // GUI
+        var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+      
+        let image: GUI.Image;
+        console.log("GUI:",filename);
+        image = new GUI.Image("aktuellesPhoto", filename);
+        image.stretch = GUI.Image.STRETCH_NONE;
+        //image.width = 0.2;
+        //image.height = "40px";
+        advancedTexture.addControl(image); 
+            
+        return advancedTexture;
+    }   
+    public static createGUIMatrix(scene: BABYLON.Scene, sText: string[]): GUI.StackPanel  {
         // GUI
         var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI");
         var size: BABYLON.ISize = advancedTexture.getSize();
     
         
-        var grid = new GUI.Grid();   
+        var grid = new GUI.StackPanel("UI" );   
         grid.left = 0;
         grid.background = "black"; 
         advancedTexture.addControl(grid); 
@@ -68,12 +82,13 @@ export class GameUtils {
         var height = 40;
         grid.height = "240px";
 
-        grid.addColumnDefinition(width, false);
+        //grid.addColumnDefinition(width, false);
                     
         let btnTest: GUI.Button[] = [];
         
-        for(var z=0; z < 6 ; z++) {
-            btnTest[z] = GUI.Button.CreateSimpleButton("but" + z, "xxxxx");
+        for(var z=0; z < sText.length ; z++) {
+            btnTest[z] = GUI.Button.CreateSimpleButton("but" + z, sText[z]);
+            console.log("GUI: ","but" + z)
             btnTest[z].width = "150px";
             btnTest[z].height = "40px";
             btnTest[z].color = "white";
@@ -82,10 +97,10 @@ export class GameUtils {
             btnTest[z].verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
             btnTest[z].left = 0;
             btnTest[z].top = 0;
-            grid.addRowDefinition(height,false);
-            grid.addControl(btnTest[z], z, 0);
+           // grid.addRowDefinition(height,false);
+           grid.addControl(btnTest[z]);
         }
-    return grid;
+     return grid;
 
     }
        /**
