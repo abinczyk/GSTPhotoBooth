@@ -1,6 +1,9 @@
 import {GameUtils} from './game-utils';
 import * as BABYLON from 'babylonjs';
 import * as GUI from "babylonjs-gui";
+let myDevices: string[] = [];
+var plane:  BABYLON.Mesh;
+var mat: BABYLON.StandardMaterial;
 
 export class Game {
 
@@ -13,13 +16,55 @@ export class Game {
     private _sharkAnimationTime = 0;
     private _swim: boolean = false;
     private aktPhoto: {filename:string, row: number, col:number};
-    
+
+
     constructor(canvasElement: string) {
         // Create canvas and engine
         this._canvas = <HTMLCanvasElement>document.getElementById(canvasElement);
         this._engine = new BABYLON.Engine(this._canvas, true);
     }
-
+    createPhotoCamera(){
+        plane = BABYLON.Mesh.CreatePlane("sphere1", 14, this._scene);
+        //plane.rotation.z = Math.PI;
+         
+        // Move the sphere upward 1/2 its height
+        plane.position.y = 4;
+            
+        mat = new BABYLON.StandardMaterial("mat", this._scene);
+        mat.diffuseColor = BABYLON.Color3.White();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+              console.log("enumerateDevices() not supported.");
+              return;
+        }
+         
+        // List cameras and microphones.
+        let z: number = 0;
+        navigator.mediaDevices.enumerateDevices()
+        .then(function(devices) {
+            devices.forEach(function(device) {
+            console.log(device.kind + ": " + device.label +
+                " id = " + device.deviceId);
+            if(device.kind === "videoinput"){
+                myDevices[z] = device.deviceId;
+                z += 1;
+            }
+         });
+        })
+        
+        .catch(function(err) {
+          console.log(err.name + ": " + err.message);
+        });
+ 
+        BABYLON.VideoTexture.CreateFromWebCam(this._scene, function(videoTexture) {
+            mat.emissiveTexture = videoTexture;
+            plane.material = mat;
+//    }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: "473ae1ab41479702bbf882891a92cda794190afa62c9e6afda32e19e07a77f29" });
+    }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: myDevices[0] });
+        
+        //var postProcess = new BABYLON.AsciiArtPostProcess("AsciiArt", camera, {
+        //    font: "15px Monospace"
+        //});
+    }
     /**
      * Creates the BABYLONJS Scene
      */
@@ -36,26 +81,40 @@ export class Game {
         // creates the sandy ground
         let ground = GameUtils.createGround(this._scene);
         // creates the watermaterial and adds the relevant nodes to the renderlist
-        let waterMaterial = GameUtils.createWater(this._scene);
-        waterMaterial.addToRenderList(skybox);
-        waterMaterial.addToRenderList(ground);
+        //let waterMaterial = GameUtils.createWater(this._scene);
+        //waterMaterial.addToRenderList(skybox);
+        //waterMaterial.addToRenderList(ground);
         // create a shark mesh from a .obj file
-        GameUtils.createShark(this._scene)
-            .subscribe(sharkMesh => {
-                this._sharkMesh = sharkMesh;
-                this._sharkMesh.getChildren().forEach(
-                    mesh => {
-                        waterMaterial.addToRenderList(mesh);
-                    }
-                );
-            });
+        //GameUtils.createShark(this._scene)
+        //    .subscribe(sharkMesh => {
+        //        this._sharkMesh = sharkMesh;
+        //        this._sharkMesh.getChildren().forEach(
+        //            mesh => {
+        //                waterMaterial.addToRenderList(mesh);
+        //            }
+        //        );
+        //    });
+        //    this.createPhotoCamera();
         // finally the new ui
-        var sMenu: string[] = ["xxxxx","yyyyy"];
+        var sMenu: string[] = ["VideoInput","yyyyy"];
         var gridGUI: GUI.StackPanel = GameUtils.createGUIMatrix(this._scene, sMenu);
         var button: GUI.Control;
+        var actVideoInput: number = 0;
+        //let myMat: BABYLON.StandardMaterial = this.mat;
+        //let myplane: BABYLON.Mesh = this.plane;
+        
         button = gridGUI.getChildByName("but0");
         button.onPointerUpObservable.add(()=>{
             console.log("GUI: ", sMenu[0]);
+            actVideoInput += 1;
+            console.log("GUI:ChangeOfVideosource", myDevices[actVideoInput]);
+            if (actVideoInput > myDevices.length -1) actVideoInput =0;
+                BABYLON.VideoTexture.CreateFromWebCam(this._scene, function(videoTexture) {
+                        mat.emissiveTexture = videoTexture;
+                        plane.material = mat;
+            //    }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: "473ae1ab41479702bbf882891a92cda794190afa62c9e6afda32e19e07a77f29" });
+                } , { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: myDevices[actVideoInput] });
+                        
         })
         button = gridGUI.getChildByName("but1");
         button.onPointerUpObservable.add(()=>{
@@ -90,7 +149,7 @@ export class Game {
                 }
             });
             */
-       var gridMatrix: GUI.Grid= GameUtils.createMatrix(this._scene);
+  /*     var gridMatrix: GUI.Grid= GameUtils.createMatrix(this._scene);
        let photos: GUI.Control[] = [];
            
        for(var z = 0;  z < 4; z++) {
@@ -112,7 +171,7 @@ export class Game {
         }.bind({btn: photos[z * 10 + zz]}))
         }
        }
-    
+    */
        
  
         // Physics engine also works

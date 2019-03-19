@@ -59,8 +59,8 @@ export class GameUtils {
         console.log("GUI:",filename);
         image = new GUI.Image("aktuellesPhoto", filename);
         image.stretch = GUI.Image.STRETCH_NONE;
-        //image.width = 0.2;
-        //image.height = "40px";
+        image.width = "1616px";
+        image.height = "1212px";
         advancedTexture.addControl(image); 
             
         return advancedTexture;
