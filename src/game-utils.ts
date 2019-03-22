@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs';
 import * as GUI from 'babylonjs-gui';
 import {Observable} from 'rxjs';
 import { zip, zipAll } from 'rxjs/operators';
-import { AdvancedDynamicTexture } from 'babylonjs-gui';
+import { AdvancedDynamicTexture, Grid } from 'babylonjs-gui';
 import { AsyncAction } from 'rxjs/scheduler/AsyncAction';
 
 export class GameUtils {
@@ -51,19 +51,21 @@ export class GameUtils {
         }
         return grid;
     }
-    public static createPhotoBackground(scene: BABYLON.Scene, filename:string): GUI.AdvancedDynamicTexture {
+    public static createPhotoBackground(scene: BABYLON.Scene, filename:string): GUI.StackPanel  {
         // GUI
         var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-      
+        var grid = new GUI.StackPanel("UI" );   
+        advancedTexture.addControl(grid);
         let image: GUI.Image;
         console.log("GUI:",filename);
-        image = new GUI.Image("aktuellesPhoto", filename);
+        image = new GUI.Image('aktuellesPhoto', filename);
         image.stretch = GUI.Image.STRETCH_NONE;
         image.width = "1616px";
         image.height = "1212px";
-        advancedTexture.addControl(image); 
+        grid.addControl(image); 
+        grid.left = 3000;
             
-        return advancedTexture;
+        return grid;
     }   
     public static createGUIMatrix(scene: BABYLON.Scene, sText: string[]): GUI.StackPanel  {
         // GUI

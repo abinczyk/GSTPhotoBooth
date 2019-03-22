@@ -16,7 +16,7 @@ export class Game {
     private _sharkAnimationTime = 0;
     private _swim: boolean = false;
     private aktPhoto: {filename:string, row: number, col:number};
-
+    
 
     constructor(canvasElement: string) {
         // Create canvas and engine
@@ -25,10 +25,10 @@ export class Game {
     }
     createPhotoCamera(){
         plane = BABYLON.Mesh.CreatePlane("sphere1", 14, this._scene);
-        //plane.rotation.z = Math.PI;
+        plane.rotation.x = Math.PI/2;
          
         // Move the sphere upward 1/2 its height
-        plane.position.y = 4;
+        plane.position.y = 0;
             
         mat = new BABYLON.StandardMaterial("mat", this._scene);
         mat.diffuseColor = BABYLON.Color3.White();
@@ -57,7 +57,7 @@ export class Game {
  
         BABYLON.VideoTexture.CreateFromWebCam(this._scene, function(videoTexture) {
             mat.emissiveTexture = videoTexture;
-            plane.material = mat;
+            plane.material = mat;
 //    }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: "473ae1ab41479702bbf882891a92cda794190afa62c9e6afda32e19e07a77f29" });
     }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: myDevices[0] });
         
@@ -72,7 +72,7 @@ export class Game {
         // create a basic BJS Scene object
         this._scene = new BABYLON.Scene(this._engine);
         // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-        this._camera = new BABYLON.ArcRotateCamera("Camera", 3 * Math.PI / 2, Math.PI / 4, 30, BABYLON.Vector3.Zero(), this._scene);
+        this._camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 30, BABYLON.Vector3.Zero(), this._scene);
         this._camera.attachControl(this._canvas, true);
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         this._light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this._scene);
@@ -80,28 +80,13 @@ export class Game {
         let skybox = GameUtils.createSkybox("skybox", "./assets/texture/skybox/TropicalSunnyDay", this._scene);
         // creates the sandy ground
         let ground = GameUtils.createGround(this._scene);
-        // creates the watermaterial and adds the relevant nodes to the renderlist
-        //let waterMaterial = GameUtils.createWater(this._scene);
-        //waterMaterial.addToRenderList(skybox);
-        //waterMaterial.addToRenderList(ground);
-        // create a shark mesh from a .obj file
-        //GameUtils.createShark(this._scene)
-        //    .subscribe(sharkMesh => {
-        //        this._sharkMesh = sharkMesh;
-        //        this._sharkMesh.getChildren().forEach(
-        //            mesh => {
-        //                waterMaterial.addToRenderList(mesh);
-        //            }
-        //        );
-        //    });
-        //    this.createPhotoCamera();
+       
+        this.createPhotoCamera();
         // finally the new ui
-        var sMenu: string[] = ["VideoInput","yyyyy"];
+        var sMenu: string[] = ["VideoInput","Start","Stop"];
         var gridGUI: GUI.StackPanel = GameUtils.createGUIMatrix(this._scene, sMenu);
         var button: GUI.Control;
         var actVideoInput: number = 0;
-        //let myMat: BABYLON.StandardMaterial = this.mat;
-        //let myplane: BABYLON.Mesh = this.plane;
         
         button = gridGUI.getChildByName("but0");
         button.onPointerUpObservable.add(()=>{
@@ -111,7 +96,7 @@ export class Game {
             if (actVideoInput > myDevices.length -1) actVideoInput =0;
                 BABYLON.VideoTexture.CreateFromWebCam(this._scene, function(videoTexture) {
                         mat.emissiveTexture = videoTexture;
-                        plane.material = mat;
+                    plane.material = mat;
             //    }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: "473ae1ab41479702bbf882891a92cda794190afa62c9e6afda32e19e07a77f29" });
                 } , { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: myDevices[actVideoInput] });
                         
@@ -119,38 +104,29 @@ export class Game {
         button = gridGUI.getChildByName("but1");
         button.onPointerUpObservable.add(()=>{
             console.log("GUI: ", sMenu[1]);
-        })
-        //button.rotation =  90;
-        //button1.color = "blue";
+            gridMatrix.left = 200;
+            gridMatrix._markAsDirty();
+        });
 
-
-        
-  
-     /*   GameUtils.createGui(guiTexture, 0, 0, "Start xxSwimming",
-            (btn) => {
-                let textControl = btn.children[0] as GUI.TextBlock;
-                this._swim = !this._swim;
-                if (this._swim) {
-                    textControl.text = "Stop xxSwimming";
-                }
-                else {
-                    textControl.text = "Start xxSwimming";
-                }
-            });
-            GameUtils.createGui(guiTexture, 0, 1, "Start Swimming",
-            (btn) => {
-                let textControl = btn.children[0] as GUI.TextBlock;
-                this._swim = !this._swim;
-                if (this._swim) {
-                    textControl.text = "Stop Swimming";
-                }
-                else {
-                    textControl.text = "Start Swimming";
-                }
-            });
-            */
-  /*     var gridMatrix: GUI.Grid= GameUtils.createMatrix(this._scene);
+        button = gridGUI.getChildByName("but2");
+        button.onPointerUpObservable.add(()=>{
+            console.log("GUI: ", sMenu[2]);
+            gridMatrix.left = "200px";
+            gridMatrix._markAsDirty();
+            gridPhotoBackground.left = "3000px";
+            gridPhotoBackground._markAsDirty();
+        });
+         
+       let gridMatrix: GUI.Grid= GameUtils.createMatrix(this._scene);
+       gridMatrix.left = 3000;
        let photos: GUI.Control[] = [];
+       let gridPhotoBackground: GUI.StackPanel = GameUtils.createPhotoBackground(this._scene,"./assets/photos/0.0.jpg");
+       let ctrl: GUI.Control = gridPhotoBackground.getChildByName('aktuellesPhoto');
+       ctrl.onPointerUpObservable.add(()=>{
+            console.log("GUI:CLICK");
+            gridMatrix.left = 200;
+            gridMatrix._markAsDirty();
+        })
            
        for(var z = 0;  z < 4; z++) {
         for (var zz = 0; zz < 3; zz++) {
@@ -163,15 +139,26 @@ export class Game {
             this.aktPhoto.filename = String(this.btn.name).substr(0,5);
             this.aktPhoto.row = String(this.btn.name).substr(5,1);
             this.aktPhoto.col = String(this.btn.name).substr(7,1);
-            this.aktPhoto.filename = "./assets/photos/" + this.aktPhoto.row + "." + this.aktPhoto.col + ".jpg"
-            GameUtils.createPhotoBackground(this._scene,this.aktPhoto.filename)
+            this.aktPhoto.filename = "./assets/photos/" + this.aktPhoto.row + "." + this.aktPhoto.col + ".jpg";
+            gridMatrix.left = 3000;
+            
+            gridPhotoBackground.removeControl(gridPhotoBackground.getChildByName('aktuellesPhoto'));
+            let image : GUI.Image;
+            image = new GUI.Image('aktuellesPhoto', this.aktPhoto.filename);
+            image.stretch = GUI.Image.STRETCH_NONE;
+            image.width = "1616px";
+            image.height = "1212px";
+            gridPhotoBackground.addControl(image);
+            gridPhotoBackground.left = 200;
+            gridPhotoBackground.alpha = 0.2;
+
             console.log("GUI:filename:", this.aktPhoto.filename,this.aktPhoto.filename);
             console.log("GUI:row", this.aktPhoto.row);
             console.log("GUI:col", this.aktPhoto.col);
         }.bind({btn: photos[z * 10 + zz]}))
         }
        }
-    */
+    
        
  
         // Physics engine also works
