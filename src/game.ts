@@ -24,8 +24,13 @@ export class Game {
         this._engine = new BABYLON.Engine(this._canvas, true);
     }
     createPhotoCamera(){
-        plane = BABYLON.Mesh.CreatePlane("sphere1", 14, this._scene);
+        plane = BABYLON.Mesh.CreatePlane("sphere1", 0.08, this._scene);
+        plane.scaling.x = 404;
+        plane.scaling.y = 303;
+        
         plane.rotation.x = Math.PI/2;
+        plane.rotation.z = -Math.PI/2;
+    
          
         // Move the sphere upward 1/2 its height
         plane.position.y = 0;
@@ -59,7 +64,7 @@ export class Game {
             mat.emissiveTexture = videoTexture;
             plane.material = mat;
 //    }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: "473ae1ab41479702bbf882891a92cda794190afa62c9e6afda32e19e07a77f29" });
-    }, { minWidth: 312, minHeight: 256, maxWidth: 312, maxHeight: 256, deviceId: myDevices[0] });
+    }, { minWidth: 312, minHeight: 256, maxWidth: 1024, maxHeight: 1024, deviceId: myDevices[0] });
         
         //var postProcess = new BABYLON.AsciiArtPostProcess("AsciiArt", camera, {
         //    font: "15px Monospace"
@@ -75,7 +80,7 @@ export class Game {
         this._camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 30, BABYLON.Vector3.Zero(), this._scene);
         this._camera.attachControl(this._canvas, true);
         // create a basic light, aiming 0,1,0 - meaning, to the sky
-        this._light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), this._scene);
+        //this._light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(100, 100, 100), this._scene);
         // create the skybox
         let skybox = GameUtils.createSkybox("skybox", "./assets/texture/skybox/TropicalSunnyDay", this._scene);
         // creates the sandy ground
@@ -104,14 +109,14 @@ export class Game {
         button = gridGUI.getChildByName("but1");
         button.onPointerUpObservable.add(()=>{
             console.log("GUI: ", sMenu[1]);
-            gridMatrix.left = 200;
+            gridMatrix.left = 0;
             gridMatrix._markAsDirty();
         });
 
         button = gridGUI.getChildByName("but2");
         button.onPointerUpObservable.add(()=>{
             console.log("GUI: ", sMenu[2]);
-            gridMatrix.left = "200px";
+            gridMatrix.left = "0px";
             gridMatrix._markAsDirty();
             gridPhotoBackground.left = "3000px";
             gridPhotoBackground._markAsDirty();
@@ -124,7 +129,7 @@ export class Game {
        let ctrl: GUI.Control = gridPhotoBackground.getChildByName('aktuellesPhoto');
        ctrl.onPointerUpObservable.add(()=>{
             console.log("GUI:CLICK");
-            gridMatrix.left = 200;
+            gridMatrix.left = 0;
             gridMatrix._markAsDirty();
         })
            
@@ -148,9 +153,12 @@ export class Game {
             image.stretch = GUI.Image.STRETCH_NONE;
             image.width = "1616px";
             image.height = "1212px";
+            image.scaleX = 0.5;
+            image.scaleY = 0.5;
+
             gridPhotoBackground.addControl(image);
-            gridPhotoBackground.left = 200;
-            gridPhotoBackground.alpha = 0.2;
+            gridPhotoBackground.left = 0;
+            gridPhotoBackground.alpha = 0.3;
 
             console.log("GUI:filename:", this.aktPhoto.filename,this.aktPhoto.filename);
             console.log("GUI:row", this.aktPhoto.row);
