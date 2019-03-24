@@ -90,19 +90,46 @@ export class Game {
         let ground = GameUtils.createGround(this._scene);
        
         this.createPhotoCamera();
-    /***************************************************************************************************
-        sidebar menu -main
-    ****************************************************************************************************/ 
+        /***************************************************************************************************
+            sidebar menu - main
+        ****************************************************************************************************/ 
 
-        var sMenu: string[] = ['VideoInput','Choose','Shoot'];
-        var gridGUI: GUI.StackPanel = GameUtils.createGUIMatrix(this._scene, sMenu);
+        var sMenu: string[] = ['Start','Options'];
+        var gridGUIMain: GUI.StackPanel = GameUtils.createGUI(this._scene, sMenu);
+        gridGUIMain.left = 0;
+        var button: GUI.Control;
+        
+        /*****************************************************************
+         MenuItem: Start
+        *****************************************************************/
+        button = gridGUIMain.getChildByName('but0');        // Menu:VideoInput
+        button.onPointerUpObservable.add(()=>{
+            console.log('GUI:', sMenu[0]);
+            gridMatrix.left = 0;
+            gridGUIMain.left = 3000;
+        })
+        /*****************************************************************
+             MenuItem: Options
+        *****************************************************************/
+        button = gridGUIMain.getChildByName('but1');
+        button.onPointerUpObservable.add(()=>{
+            console.log('GUI:', sMenu[1]);
+            gridGUIOptions.left = 0;
+            gridGUIMain.left = 3000;
+        });
+        /***************************************************************************************************
+            sidebar menu - options
+        ****************************************************************************************************/ 
+
+        var sMenu: string[] = ['VideoInput','Size','CountDown-Timer','Cancel'];
+        var gridGUIOptions: GUI.StackPanel = GameUtils.createGUI(this._scene, sMenu);
         var button: GUI.Control;
         var actVideoInput: number = 0;
         
          /*****************************************************************
-            Menu:VideoInput
+            MenuItem: VideoInput
          *****************************************************************/
-         button = gridGUI.getChildByName('but0');        // Menu:VideoInput
+         button = gridGUIOptions.getChildByName('but0');        // Menu:VideoInput
         button.onPointerUpObservable.add(()=>{
             console.log('GUI:', sMenu[0]);
             actVideoInput += 1;
@@ -115,34 +142,109 @@ export class Game {
                         
         })
         /*****************************************************************
-            Menu:Choose
+            MenuItem: Size
         *****************************************************************/
-        button = gridGUI.getChildByName('but1');
+        button = gridGUIOptions.getChildByName('but1');
         button.onPointerUpObservable.add(()=>{
             console.log('GUI:', sMenu[1]);
             gridMatrix.left = 0;
             gridPhotoBackground.left = '3000px';
         });
         /*****************************************************************
-            Menu:Shoot
+            MenuItem: CountDown
         *****************************************************************/
-        button = gridGUI.getChildByName('but2');
+        button = gridGUIOptions.getChildByName('but2');
         button.onPointerUpObservable.add(()=>{
             console.log('GUI:', sMenu[2]);
-            gridMatrix.left = '0px';
-            gridMatrix._markAsDirty();
-            gridPhotoBackground.left = '3000px';
         });
-         
+            /*****************************************************************
+             MenuItem: Cancel
+        *****************************************************************/
+        button = gridGUIOptions.getChildByName('but3');
+        button.onPointerUpObservable.add(()=>{
+            console.log('GUI:', sMenu[2]);
+            gridGUIMain.left = '0px';
+            gridGUIOptions.left = '3000px';
+        });
+
+    /***************************************************************************************************
+        sidebar menu - shoot
+    ****************************************************************************************************/ 
+
+   sMenu = ['Shoot','Abbrechen'];
+   var gridGUIShoot: GUI.StackPanel = GameUtils.createGUI(this._scene, sMenu);
+   var button: GUI.Control;
+   
+    /*****************************************************************
+       MenuItem: Shoot
+    *****************************************************************/
+    button = gridGUIShoot.getChildByName('but0');        // Menu:VideoInput
+    button.onPointerUpObservable.add(()=>{
+       console.log('GUI:', sMenu[0]);
+       actVideoInput += 1;
+       console.log('GUI:Shoot|Shoot');
+        //TODO: Countdown Timer starten
+    })
+   /*****************************************************************
+       MenuItem: Abbrechen
+   *****************************************************************/
+   button = gridGUIShoot.getChildByName('but1');
+   button.onPointerUpObservable.add(()=>{
+       console.log('GUI:', sMenu[1]);
+       gridGUIMain.left = 0;
+       gridGUIShoot.left = 3000;
+       gridPhotoBackground.left = 3000;
+   });
+ 
         /***************************************************************************************************
             photo matrix
         ****************************************************************************************************/ 
         let gridMatrix: GUI.Grid= GameUtils.createMatrix(this._scene);
         gridMatrix.left = 3000;
+        let photos: GUI.Control[] = [];
+        
+    /***************************************************************************************************
+        all photos are clickable
+    ****************************************************************************************************/ 
+
+    for(var z = 0;  z < 4; z++) {
+        for (var zz = 0; zz < 3; zz++) {
+            photos[z * 10 + zz] = gridMatrix.getChildByName('photo' + z +'.' + zz);
+            photos[z * 10 + zz].onPointerUpObservable.add(
+                function(){
+            
+                    this.aktPhoto = {filename:'', col:-1, ro:-1};
+                    this.aktPhoto.filename = String(this.btn.name).substr(0,5);
+                    this.aktPhoto.row = String(this.btn.name).substr(5,1);
+                    this.aktPhoto.col = String(this.btn.name).substr(7,1);
+                    this.aktPhoto.filename = './assets/photos/' + this.aktPhoto.row + '.' + this.aktPhoto.col + '.jpg';
+                    
+                    gridPhotoBackground.removeControl(gridPhotoBackground.getChildByName('aktuellesPhoto'));
+                    
+                    let image : GUI.Image;
+                    image = new GUI.Image('aktuellesPhoto', this.aktPhoto.filename);
+                    image.stretch = GUI.Image.STRETCH_NONE;
+                    image.width = '1616px';
+                    image.height = '1212px';
+                    image.scaleX = 0.5;
+                    image.scaleY = 0.5;
+
+                    gridPhotoBackground.addControl(image);
+                    gridPhotoBackground.left = 0;
+                    gridPhotoBackground.alpha = 0.3;
+                    gridMatrix.left = 3000;  // hide GUIMatrix
+                    gridGUIShoot.left = 0;
+                                    
+                    console.log('GUI:filename:', this.aktPhoto.filename,this.aktPhoto.filename);
+                    console.log('GUI:row', this.aktPhoto.row);
+                    console.log('GUI:col', this.aktPhoto.col);
+                }.bind({btn: photos[z * 10 + zz]}))
+            }
+        }
         /***************************************************************************************************
             photobackground for shooting
-        ****************************************************************************************************/ 
-       let photos: GUI.Control[] = [];
+        ****************************************************************************************************/
+
         let gridPhotoBackground: GUI.StackPanel = GameUtils.createPhotoBackground(this._scene,'./assets/photos/0.0.jpg');
         let ctrl: GUI.Control = gridPhotoBackground.getChildByName('aktuellesPhoto');
         ctrl.onPointerUpObservable.add(()=>{
@@ -151,45 +253,8 @@ export class Game {
             gridPhotoBackground.left = '3000px';
         })
        
-    /***************************************************************************************************
-        all photos are clickable
-    ****************************************************************************************************/ 
-
-        for(var z = 0;  z < 4; z++) {
-            for (var zz = 0; zz < 3; zz++) {
-                photos[z * 10 + zz] = gridMatrix.getChildByName('photo' + z +'.' + zz);
-                photos[z * 10 + zz].onPointerUpObservable.add(
-                    function(){
-                
-                        this.aktPhoto = {filename:'', col:-1, ro:-1};
-                        this.aktPhoto.filename = String(this.btn.name).substr(0,5);
-                        this.aktPhoto.row = String(this.btn.name).substr(5,1);
-                        this.aktPhoto.col = String(this.btn.name).substr(7,1);
-                        this.aktPhoto.filename = './assets/photos/' + this.aktPhoto.row + '.' + this.aktPhoto.col + '.jpg';
-                        
-                        gridPhotoBackground.removeControl(gridPhotoBackground.getChildByName('aktuellesPhoto'));
-                        
-                        let image : GUI.Image;
-                        image = new GUI.Image('aktuellesPhoto', this.aktPhoto.filename);
-                        image.stretch = GUI.Image.STRETCH_NONE;
-                        image.width = '1616px';
-                        image.height = '1212px';
-                        image.scaleX = 0.5;
-                        image.scaleY = 0.5;
-
-                        gridPhotoBackground.addControl(image);
-                        gridPhotoBackground.left = 0;
-                        gridPhotoBackground.alpha = 0.3;
-                        gridMatrix.left = 3000;  // hide GUIMatrix
-                    
-                        console.log('GUI:filename:', this.aktPhoto.filename,this.aktPhoto.filename);
-                        console.log('GUI:row', this.aktPhoto.row);
-                        console.log('GUI:col', this.aktPhoto.col);
-                    }.bind({btn: photos[z * 10 + zz]}))
-                }
-            }
-        }
-
+    }
+    
     private CountDown(time: number){
         
         if(this._isCountDownStarted){

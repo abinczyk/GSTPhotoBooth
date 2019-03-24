@@ -1,6 +1,6 @@
 {
-  "name": "babylonjs-typescript-webpack-starter",
-  "version": "1.0.0",
+  "name": "binphotobooth",
+  "version": "0.1.0",
   "description": "Template for Webpack TypeScript and BabylonJS",
   "main": "index.js",
   "scripts": {

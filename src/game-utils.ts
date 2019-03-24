@@ -67,7 +67,7 @@ export class GameUtils {
             
         return grid;
     }   
-    public static createGUIMatrix(scene: BABYLON.Scene, sText: string[]): GUI.StackPanel  {
+    public static createGUI(scene: BABYLON.Scene, sText: string[]): GUI.StackPanel  {
         // GUI
         var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GUI");
         var size: BABYLON.ISize = advancedTexture.getSize();
@@ -102,6 +102,7 @@ export class GameUtils {
            // grid.addRowDefinition(height,false);
            grid.addControl(btnTest[z]);
         }
+        grid.left = 3000;
      return grid;
 
     }
