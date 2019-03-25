@@ -6,6 +6,8 @@ var plane:  BABYLON.Mesh;
 var mat: BABYLON.StandardMaterial;
 const MAXROW: number = 3;
 const MAXCOL: number = 4;
+var myCamera: BABYLON.ArcRotateCamera;
+var nCountDownValue: number = 3;
 
 export class Game {
 
@@ -19,7 +21,8 @@ export class Game {
     private _swim: boolean = false;
     private aktPhoto: {filename:string, row: number, col:number};
     private _isCountDownStarted: boolean = false;
-    private _nCountDownValue: number = 3;
+    private  GUICountDown:GUI.AdvancedDynamicTexture;
+    private gunshot:BABYLON.Sound;
 
     constructor(canvasElement: string) {
         // Create canvas and engine
@@ -82,6 +85,13 @@ export class Game {
         // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
         this._camera = new BABYLON.ArcRotateCamera('Camera', 0, 0, 30, BABYLON.Vector3.Zero(), this._scene);
         this._camera.attachControl(this._canvas, true);
+        myCamera = this._camera;
+        this.GUICountDown =  GUI.AdvancedDynamicTexture.CreateFullscreenUI("CountDown");
+        
+
+        // Sounds
+        this.gunshot = new BABYLON.Sound("gunshot", "./assets/sounds/flap-short1.wav", this._scene);
+
         // create a basic light, aiming 0,1,0 - meaning, to the sky
         //this._light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(100, 100, 100), this._scene);
         // create the skybox
@@ -115,6 +125,7 @@ export class Game {
         button.onPointerUpObservable.add(()=>{
             console.log('GUI:', sMenu[1]);
             gridGUIOptions.left = 0;
+            gridPhotoBackground.left = 0;
             gridGUIMain.left = 3000;
         });
         /***************************************************************************************************
@@ -150,13 +161,41 @@ export class Game {
             gridMatrix.left = 0;
             gridPhotoBackground.left = '3000px';
         });
+        var header = new GUI.TextBlock();
+        header.text = "Size: 0";
+        header.height = "30px";
+        header.color = "white";
+        gridGUIOptions.addControl(header); 
+        var slider = new GUI.Slider();
+        slider.minimum = 0;
+        slider.maximum = 60;
+        slider.value = 0;
+        slider.height = "20px";
+        slider.width = "200px";
+        slider.onValueChangedObservable.add(function(value) {
+            header.text = "Grösse: " + Math.round(value);
+            myCamera.radius = value;
+        });
+        gridGUIOptions.addControl(slider);    
         /*****************************************************************
             MenuItem: CountDown
         *****************************************************************/
-        button = gridGUIOptions.getChildByName('but2');
-        button.onPointerUpObservable.add(()=>{
-            console.log('GUI:', sMenu[2]);
-        });
+       var header1 = new GUI.TextBlock();
+       header1.text = "Timer: " + nCountDownValue;
+       header1.height = "30px";
+       header1.color = "white";
+       gridGUIOptions.addControl(header1); 
+       var slider1 = new GUI.Slider();
+       slider1.minimum = 3;
+       slider1.maximum = 10;
+       slider1.value = 0;
+       slider1.height = "20px";
+       slider1.width = "200px";
+       slider1.onValueChangedObservable.add(function(value) {
+            nCountDownValue = Math.round(value);
+            header1.text = "Timer: " + nCountDownValue;
+       });
+       gridGUIOptions.addControl(slider1);    
             /*****************************************************************
              MenuItem: Cancel
         *****************************************************************/
@@ -164,6 +203,7 @@ export class Game {
         button.onPointerUpObservable.add(()=>{
             console.log('GUI:', sMenu[2]);
             gridGUIMain.left = '0px';
+            gridPhotoBackground.left = 3000;
             gridGUIOptions.left = '3000px';
         });
 
@@ -184,6 +224,8 @@ export class Game {
        actVideoInput += 1;
        console.log('GUI:Shoot|Shoot');
         //TODO: Countdown Timer starten
+        this.CountDown(nCountDownValue); 
+
     })
    /*****************************************************************
        MenuItem: Abbrechen
@@ -247,19 +289,54 @@ export class Game {
 
         let gridPhotoBackground: GUI.StackPanel = GameUtils.createPhotoBackground(this._scene,'./assets/photos/0.0.jpg');
         let ctrl: GUI.Control = gridPhotoBackground.getChildByName('aktuellesPhoto');
+        ctrl.scaleX = 0.5;
+        ctrl.scaleY = 0.5;
+        ctrl.alpha = 0.3;
+
         ctrl.onPointerUpObservable.add(()=>{
             console.log('GUI:CLICK');
             gridMatrix.left = 0;
-            gridPhotoBackground.left = '3000px';
+            gridPhotoBackground.left = '3000px';   
+            this.CountDown(nCountDownValue); 
         })
        
     }
     
+
     private CountDown(time: number){
         
-        if(this._isCountDownStarted){
-            console.log(this._nCountDownValue -= time);
-        }
+        var i = 5; // seconds
+
+        let grid:GUI.StackPanel = new GUI.StackPanel("CountDown");
+        grid.left = "0px";
+        grid.top = "0px";
+        grid.width = "300px";
+        grid.height = "300px";
+              
+        
+        let textBlock: GUI.TextBlock = new GUI.TextBlock("text", String(i));   
+        textBlock.height = "300px";
+        textBlock.fontSize = 300;
+        textBlock.color = "grey";
+        grid.addControl(textBlock);
+        let ctrl: GUI.Button = new GUI.Button("text");   
+        grid.addControl(ctrl);
+        this.GUICountDown.addControl(grid);
+
+        var handle = window.setInterval(() => {
+            i--;
+            textBlock.text = String(i);
+
+            if (i === 0) {
+                window.clearInterval(handle);
+                // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+                this.gunshot.play();
+                // Move the sphere upward 1/2 its height
+                
+                textBlock.dispose();
+                grid.dispose();
+            }
+        }, 1000);
     }
     /***************************************************************************************************
         Starts the animation loop.
@@ -268,7 +345,7 @@ export class Game {
         this._scene.registerBeforeRender(() => {
             let deltaTime: number = (1 / this._engine.getFps());
             this.animateShark(deltaTime);
-            this.CountDown(deltaTime);
+ //           this.CountDown(deltaTime);
         });
 
         // run the render loop

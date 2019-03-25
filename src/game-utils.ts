@@ -73,7 +73,7 @@ export class GameUtils {
         var size: BABYLON.ISize = advancedTexture.getSize();
     
         
-        var grid = new GUI.StackPanel("UI" );   
+        var grid = new GUI.StackPanel("UI");   
         grid.left = 0;
         grid.background = "black"; 
         advancedTexture.addControl(grid); 
@@ -82,7 +82,7 @@ export class GameUtils {
         grid.width = "150px";
         var width = 150;   
         var height = 40;
-        grid.height = "240px";
+        grid.height = "300px";
 
         //grid.addColumnDefinition(width, false);
                     
