@@ -27,7 +27,7 @@ export class Game {
     constructor(canvasElement: string) {
         // Create canvas and engine
         this._canvas = <HTMLCanvasElement>document.getElementById(canvasElement);
-        this._engine = new BABYLON.Engine(this._canvas, true);
+        this._engine = new BABYLON.Engine(this._canvas, true,{ preserveDrawingBuffer: true, stencil: true });
     }
     createPhotoCamera(){
         plane = BABYLON.Mesh.CreatePlane('sphere1', 0.08, this._scene);
@@ -147,7 +147,7 @@ export class Game {
             console.log('GUI:ChangeOfVideosource', myDevices[actVideoInput]);
             if (actVideoInput > myDevices.length -1) actVideoInput =0;
                 BABYLON.VideoTexture.CreateFromWebCam(this._scene, function(videoTexture) {
-                        mat.emissiveTexture = videoTexture;
+                    mat.emissiveTexture = videoTexture;
                     plane.material = mat;
                 } , { minWidth: 312, minHeight: 256, maxWidth: 1024, maxHeight: 1024, deviceId: myDevices[actVideoInput] });
                         
@@ -332,7 +332,31 @@ export class Game {
                 // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
                 this.gunshot.play();
                 // Move the sphere upward 1/2 its height
-                
+                BABYLON.Tools.CreateScreenshotUsingRenderTarget(this._engine, this._camera, { width: 1024, height:1024 });
+                /*
+                BABYLON.Tools.CreateScreenshotUsingRenderTarget(this._engine, this._camera,  { width: 1024, height: 300 },
+                        function (data) {
+                       var img = window.document.createElement("img");
+                       img.src = data;
+                       //img.href =data;
+                       //img. = data;
+                      
+                      // a.href = imageurl;
+                      var date = new Date();
+                    var stringDate = (date.getFullYear() + "-" + (date.getMonth() + 1)).slice(-2) + "-" + date.getDate() + "_" + date.getHours() + "-" + ('0' + date.getMinutes()).slice(-2);
+                    img.setAttribute("download", "screenshot_" + stringDate + ".png");
+                    img.setAttribute("href", data)
+                      // img.setAttribute("download", "dynamictexture.png");
+           
+                       window.document.body.appendChild(img);
+           
+                       img.addEventListener("click", function() {
+                           img.parentElement.removeChild(img);
+                       });
+                       img.click();
+           
+//                       document.body.appendChild(img);
+                    }); */
                 textBlock.dispose();
                 grid.dispose();
             }

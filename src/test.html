@@ -1,0 +1,31 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title> Cmaer</title>
+<script type="text/javascript" src="cordova.js" ></script>
+<script type="text/javascript">
+var pictureSource,destinationType;
+            document.addEventListener("deviceready",loaded,false);
+            function loaded() {
+                pictureSource=navigator.camera.PictureSourceType;
+                destinationType=navigator.camera.DestinationType;
+            }
+            function getPhoto(imageData) {
+                var smallImage = document.getElementById('smallImage');
+                smallImage.style.display = 'block';
+                smallImage.src = imageData;
+            }
+            function capturePhoto() {
+                navigator.camera.getPicture(getPhoto, onFail, { quality: 50 });
+            }
+            function onFail(message) {
+                alert('Failed because: ' + message);
+            }
+            </script>
+    </head>
+    <body>
+        <button onclick="capturePhoto();">Capture Photo</button> <br>
+        <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
+
+</body>
+</html>
