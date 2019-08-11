@@ -1,4 +1,4 @@
-A starter template for those who want to use the famous javascript 3D game engine babylonjs with typescript and webpack.
+A photobooth for my wedding in august 2019 made with the famous javascript 3D game engine babylonjs with typescript and webpack.
 
 ## How to Start? ##
 
