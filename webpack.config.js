@@ -4,7 +4,7 @@ const webpack = require('webpack');
 // creates index.html file by a template index.ejs
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 // cleans dist folder
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // copies the assets folder into dist folder
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // output folder location
@@ -14,13 +14,15 @@ module.exports = {
   mode: 'development',
   entry: './src/index.ts',
   plugins: [
-    new CleanWebpackPlugin([distFolder]),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: 'src/index.ejs'
     }),
-    new CopyWebpackPlugin([
-      { from: 'src/assets', to: 'assets' },
-    ])
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/assets', to: 'assets' },
+      ]
+    })
   ],
   devtool: 'inline-source-map',
   devServer: {
@@ -44,17 +46,17 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-        cacheGroups: {
-            commons: {
-                test: /[\\/]node_modules[\\/]/,
-                name: "vendors",
-                chunks: "all"
-            }
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendors",
+          chunks: "all"
         }
+      }
     }
   },
   resolve: {
-    extensions: [ ".tsx", ".ts", ".js" ]
+    extensions: [".tsx", ".ts", ".js"]
   },
   output: {
     filename: '[name].bundle.js',
